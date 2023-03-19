@@ -13,9 +13,11 @@
 #navLinkItem {
     position: relative;
 }
-/* #navLinkItem:hover #cartNumber {
-    background-color: rgb(231, 90, 65);
-} */
+
+.fa-solid.fa-minus,
+.fa-solid.fa-plus{
+    cursor: pointer;
+}
 
 #cartNumber {
     width: 30px;

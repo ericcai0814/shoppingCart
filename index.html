@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Vue option API 購物車</title>
     <!-- font-awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <!-- bootstrap.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css">
     <!-- style.css -->
@@ -30,7 +30,7 @@
                     <a id="navLinkItem" class="nav-link" href="#cartModal" data-toggle="modal">
                         <i class="fas fa-shopping-cart"></i> 
                         購物車
-                        <div id="cartNumber">0</div>
+                        <div id="cartNumber" v-show="cartItemCount >= 0">{{ cartItemCount}}</div>
                     </a>
                 </li>
             </ul>
@@ -62,13 +62,17 @@
                             <p class="card-text">
                                 商品價格: {{item.price}}
                             </p>
-                            <div class="form-group">
+                            <div class="form-group d-flex">
                                 <label>購買數量</label>
-                                <input class="form-control" type="number" min="1" max="20" required v-model="item.qty">
+                                <div class="plusMinus ml-2">
+                                    <i class="fa-solid fa-minus" @click="item.qty > 0 ? item.qty-- : null"></i>
+                                    <span class="mx-1 p-2 border">{{item.qty}}</span>
+                                    <i class="fa-solid fa-plus" @click="item.qty ++"></i>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <button class="btn btn-primary" type="button" @click="addItem(item.id, item.qty)">
-                                    <i class="fas fa-cart-plus"></i> 
+                                    <i class="fas fa-cart-plus"></i>
                                     加入購物車
                                 </button>
                             </div>
@@ -110,18 +114,39 @@
                     <table class="table table-border">
                         <thead>
                             <tr>
-                                <th>產品名稱</th><em>{{productData.name}}</em>
-                                <th class="text-right">單價</th><em>{{productData.price}}</em>
-                                <th class="text-right">數量</th><em>{{productData.qty}}</em>
-                                <th class="text-right">總計</th><em>{{productData.price * productData.qty}}</em>
+                                <th>產品名稱</th>
+                                <th class="text-right">單價</th>
+                                <th class="text-right">數量</th>
+                                <th class="text-right">總計</th>
                             </tr>
                         </thead>
-                        <tbody id="cartTableBody"></tbody>
-                        <tfoot id="cartTableFoot"></tfoot>
+                        <tbody id="cartTableBody">
+                            <tr v-if="productData.length > 0" v-for="(item, index) in productData" :key="item.id">
+                                <td>
+                                    <button :data-index="productData.id" class="btn btn-danger delete-btn" @click="removeFromCart(index)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    {{item.title}}
+                                </td>
+                                <td class="text-right">TWD$ {{item.price}}</td>
+                                <td class="text-right">{{item.qty}}</td>
+                                <td class="text-right">TWD${{item.priceAmount}}</td>
+                            </tr>          
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-right">TWD${{calculateTotal()}}</td>
+                            </tr>
+                        </tbody>
+                        
+                        <tfoot id="cartTableFoot">
+                            
+                        </tfoot>
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button id="clearCartBtn" type="button" class="btn btn-danger">
+                    <button id="clearCartBtn" type="button" class="btn btn-danger" @click="clearCart()">
                         <i class="fas fa-trash-alt"></i> 清空購物車
                     </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -151,104 +176,152 @@
                     productList :[
                         {
                             id: '1',
-                            title: '產品一',
-                            price: 10,
-                            qty: parseInt(""),                            
+                            title: 'Chair',
+                            price: 385,
+                            qty: parseInt("0"),                            
                             img: 'https://picsum.photos/id/100/1200/600',
                         },
                         {
                             id: '2',
-                            title: '產品二',
-                            price: 60,
-                            qty: parseInt(""),
+                            title: 'Mouse',
+                            price: 973,
+                            qty: parseInt("0"),
                             img: 'https://picsum.photos/id/101/1200/600',
                         },
                         {
                             id: '3',
-                            title: '產品三',
-                            price: 180,
-                            qty: parseInt(""),
+                            title: 'Computer',
+                            price: 125,
+                            qty: parseInt("0"),
                             img: 'https://picsum.photos/id/102/1200/600',
                         },
                         {
                             id: '4',
-                            title: '產品四',
+                            title: 'Keyboard',
                             price: 220,
-                            qty: parseInt(""),
+                            qty: parseInt("0"),
                             img: 'https://picsum.photos/id/103/1200/600',
                         },
                         {
                             id: '5',
-                            title: '產品五',
+                            title: 'Table',
                             price: 360,
-                            qty: parseInt(""),
+                            qty: parseInt("0"),
                             img: 'https://picsum.photos/id/104/1200/600',
                         },
                         {
                             id: '6',
-                            title: '產品六',
+                            title: 'Sleek Fresh Bike',
                             price: 360,
-                            qty: parseInt(""),
+                            qty: parseInt("0"),
                             img: 'https://picsum.photos/id/109/1200/600',
                         },
                         {
                             id: '7',
-                            title: '產品七',
+                            title: 'Gorgeous Fresh Soap',
                             price: 400,
-                            qty: parseInt(""),
+                            qty: parseInt("0"),
                             img: 'https://picsum.photos/id/106/1200/600',
                         },
                         {
                             id: '8',
-                            title: '產品八',
+                            title: 'Handmade Soft Pants',
                             price: 450,
-                            qty: parseInt(""),
+                            qty: parseInt("0"),
                             img: 'https://picsum.photos/id/107/1200/600',
                         },
                         {
                             id: '9',
-                            title: '產品九',
+                            title: 'Intelligent Metal Keyboard',
                             price: 520,
-                            qty: parseInt(""),
+                            qty: parseInt("0"),
                             img: 'https://picsum.photos/id/108/1200/600',
                         }
                     ],
 
-                    // TODO: 購物車資料
+                    // 購物車資料
                     productData: [],
+
+                    // 購物車商品數量
+                    
                 }
             },
-            mounted() {
+            computed: {
+
+                // TODO: 購物車數量渲染
+                cartItemCount() {
+                    let count = 0;
+                    for (let i = 0; i < this.productData.length; i++) {
+                        count += this.productData[i].qty;
+                    }
+                    return count;
+                }
+
                 
+            },  
+            mounted() {
+                // 購物車數量渲染
+                this.$watch('cartItems', () => {
+                    this.cartItemCount = this.getCartItemCount();
+                }, { deep: true });
             },
             methods: {
-
-                // TODO: 傳入商品id與數量並新增商品至購物車
-                addItem(id, qty) {
-                    const product = this.productList.find(product =>{
-                        return product.id === id;
-                    });
-                    console.log("[商品明細]", product);
-
-                    const item = {
-                        ...product, 
-                        qty: qty, 
-                        createTime: new Date().getTime()
-                    };
-                    // console.log("[品項]", item);
-
-                    this.productData.push(item);
-
-                    JSON.parse(JSON.stringify(this.productData));
-                    console.log(this.productData);
+                calculateTotal() {
+                    let total = 0;
+                    for (let i = 0; i < this.productData.length; i++) {
+                    const item = this.productData[i];
+                       total += item.qty * item.price;
+                    }
+                    this.total = total;
+                    return total;
                 },
-                // TODO: 清空購物車
 
-                // TODO: 更新資料到 LocalStorage
+                // 傳入商品id與數量並新增商品至購物車
+                addItem(id, qty) {
+                    const product = this.productList.find(product => product.id === id);
 
-                // TODO: 一進畫面就抓 LocalStorage 資料
+                    if(qty > 0){
 
-                // TODO: 清空購物車
+                        let itemIndex = -1;
+                        for (let i = 0; i < this.productData.length; i++) {
+                            if(this.productData[i].id === id){
+                                itemIndex = i;
+                                break;
+                            }
+                        }
+                        if(itemIndex === -1){
+                            // 淺拷貝
+                            const item = {
+                                ...product, 
+                                qty: qty, 
+                                priceAmount: product.price * qty,
+                                createTime: new Date().getTime()
+                            };
+                            this.productData.push(item);
+                                
+                            console.log("[品項]", this.productData);
+                        }else{
+                            this.productData[itemIndex].qty += qty;
+                            this.productData[itemIndex].priceAmount = product.price * this.productData[itemIndex].qty;
+                        }
+                        // 避免傳參考影響原資料
+                        JSON.parse(JSON.stringify(this.productData));
+                        console.log(this.productData);
+                    }
+                },
+                
+
+                // 清空購物車
+                clearCart() {
+                    this.productData.splice(0, this.productData.length);
+                    this.productData = [];
+                },
+
+                // 刪除單個商品
+                removeFromCart(index) {
+                    this.productData.splice(index, 1);
+                },
+
             },
         })
         const vm = app.mount("#app");
